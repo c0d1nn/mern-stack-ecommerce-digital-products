@@ -1,7 +1,7 @@
 // routes/documentRouter.js
 import express from "express";
 import multer from "multer";
-import Document from "../models/Document.js";
+import { Document } from "../models/documentModel.js";
 import { auth } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
