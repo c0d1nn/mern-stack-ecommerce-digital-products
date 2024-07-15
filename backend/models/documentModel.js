@@ -4,8 +4,7 @@ const DocumentSchema = mongoose.Schema({
   descriptionID: { type: String, required: false },
   descriptionEN: { type: String, required: false },
   fileDocument: {
-    data: { type: Buffer, required: true },
-    contentType: { type: String, required: true },
+    url: { type: String, required: true },
     name: { type: String, required: true },
   },
 

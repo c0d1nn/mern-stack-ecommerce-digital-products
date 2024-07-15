@@ -3,6 +3,12 @@ import express from "express";
 import multer from "multer";
 import { Document } from "../models/documentModel.js";
 import { auth } from "../middleware/authMiddleware.js";
+import {
+  storage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+} from "../config/firebase.js";
 
 const router = express.Router();
 const upload = multer({ limits: { fileSize: 50 * 1024 * 1024 } }); // 50MB file limit
@@ -23,16 +29,21 @@ router.post("/", auth, upload.single("fileDocument"), async (req, res) => {
       });
     }
 
-    const newFileDocument = {
-      data: req.file.buffer,
+    const storageRef = ref(storage, `documents/${req.file.originalname}`);
+    const metadata = {
       contentType: req.file.mimetype,
-      name: req.file.originalname,
     };
+
+    const snapshot = await uploadBytes(storageRef, req.file.buffer, metadata);
+    const fileUrl = await getDownloadURL(snapshot.ref);
 
     const newDocument = {
       descriptionID: req.body.descriptionID,
       descriptionEN: req.body.descriptionEN,
-      fileDocument: newFileDocument,
+      fileDocument: {
+        url: fileUrl,
+        name: req.file.originalname,
+      },
       articleDate: req.body.articleDate,
       category: req.body.category,
       selectType: req.body.selectType,
