@@ -18,5 +18,4 @@ const DocumentSchema = new mongoose.Schema({
   selectType: String,
 });
 
-const DocumentModel = mongoose.model("document", DocumentSchema);
-module.exports = DocumentModel;
+export const DocumentModel = mongoose.model("document", DocumentSchema);

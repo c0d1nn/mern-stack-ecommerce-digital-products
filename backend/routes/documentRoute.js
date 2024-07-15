@@ -1,21 +1,131 @@
-const express = require("express");
-const router = express.Router();
-const multer = require("multer");
-const DocumentModel = require("../models/Document");
-const upload = multer({ limits: { fileSize: 50 * 1024 * 1024 } });
+// routes/documentRouter.js
+import express from "express";
+import multer from "multer";
+import Document from "../models/Document.js";
+import { auth } from "../middleware/authMiddleware.js";
 
-router.get("/get", (req, res) => {
-  DocumentModel.find()
-    .then((document) => res.json(document))
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ error: "Internal Server Error" });
-    });
+const router = express.Router();
+const upload = multer({ limits: { fileSize: 50 * 1024 * 1024 } }); // 50MB file limit
+
+// CREATE NEW DOCUMENT ROUTE
+router.post("/", auth, upload.single("fileDocument"), async (req, res) => {
+  try {
+    if (
+      !req.file ||
+      !req.body.descriptionID ||
+      !req.body.descriptionEN ||
+      !req.body.articleDate ||
+      !req.body.category ||
+      !req.body.selectType
+    ) {
+      return res.status(400).send({
+        message: "Required fields are missing",
+      });
+    }
+
+    const newFileDocument = {
+      data: req.file.buffer,
+      contentType: req.file.mimetype,
+      name: req.file.originalname,
+    };
+
+    const newDocument = {
+      descriptionID: req.body.descriptionID,
+      descriptionEN: req.body.descriptionEN,
+      fileDocument: newFileDocument,
+      articleDate: req.body.articleDate,
+      category: req.body.category,
+      selectType: req.body.selectType,
+    };
+
+    const document = await Document.create(newDocument);
+
+    return res.status(201).send(document);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send({ message: error.message });
+  }
 });
 
-router.get("/documents/:filename", async (req, res) => {
+// GET ALL DOCUMENTS ROUTE
+router.get("/", async (req, res) => {
   try {
-    const document = await DocumentModel.findOne({
+    const documents = await Document.find({});
+    return res.status(200).json({ data: documents });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send({ message: error.message });
+  }
+});
+
+// GET SINGLE DOCUMENT ROUTE
+router.get("/:id", async (req, res) => {
+  try {
+    const document = await Document.findById(req.params.id);
+
+    if (!document) {
+      return res.status(404).send({ message: "Document not found" });
+    }
+
+    return res.status(200).json(document);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send({ message: error.message });
+  }
+});
+
+// DELETE DOCUMENT ROUTE
+router.delete("/:id", auth, async (req, res) => {
+  try {
+    const result = await Document.findByIdAndDelete(req.params.id);
+
+    if (!result) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Document successfully deleted", deletedItem: result });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send({ message: error.message });
+  }
+});
+
+// UPDATE DOCUMENT ROUTE (excluding file data)
+router.put("/:id", auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const updateData = {
+      descriptionID: req.body.descriptionID,
+      descriptionEN: req.body.descriptionEN,
+      articleDate: req.body.articleDate,
+      category: req.body.category,
+      selectType: req.body.selectType,
+    };
+
+    const result = await Document.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
+
+    if (!result) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+
+    return res
+      .status(200)
+      .send({ message: "Document updated", updatedDocument: result });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send({ message: error.message });
+  }
+});
+
+// DOWNLOAD DOCUMENT ROUTE
+router.get("/download/:filename", async (req, res) => {
+  try {
+    const document = await Document.findOne({
       "fileDocument.name": req.params.filename,
     });
 
@@ -34,40 +144,4 @@ router.get("/documents/:filename", async (req, res) => {
   }
 });
 
-router.post("/post", upload.single("fileDocument"), async (req, res) => {
-  try {
-    const { descriptionID, descriptionEN, articleDate, category, selectType } =
-      req.body;
-    const newFileDocument = {
-      data: req.file.buffer,
-      contentType: req.file.mimetype,
-      name: req.file.originalname,
-    };
-
-    await DocumentModel.create({
-      descriptionID,
-      descriptionEN,
-      fileDocument: newFileDocument,
-      articleDate,
-      category,
-      selectType,
-    });
-
-    res.json({ message: "File uploaded successfully" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-router.delete("/documents/:id", async (req, res) => {
-  try {
-    const documentIdToDelete = req.params.id;
-    await DocumentModel.findByIdAndDelete(documentIdToDelete);
-
-    res.json({ message: "Document deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-module.exports = router;
+export default router;
