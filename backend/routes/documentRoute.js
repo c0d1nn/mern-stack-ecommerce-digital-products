@@ -59,13 +59,23 @@ router.post("/", auth, upload.single("fileDocument"), async (req, res) => {
 });
 
 // GET ALL DOCUMENTS ROUTE
+// router.get("/", async (req, res) => {
+//   try {
+//     const documents = await Document.find({});
+//     return res.status(200).json({ data: documents });
+//   } catch (error) {
+//     console.log(error.message);
+//     res.status(500).send({ message: error.message });
+//   }
+// });
+
 router.get("/", async (req, res) => {
   try {
     const documents = await Document.find({});
-    return res.status(200).json({ data: documents });
+    return res.status(200).json(documents);
   } catch (error) {
-    console.log(error.message);
-    res.status(500).send({ message: error.message });
+    console.error(error.message);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
