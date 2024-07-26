@@ -142,9 +142,7 @@ router.get("/user", async (req, res) => {
   try {
     const user = await User.find({});
 
-    return res.status(200).json({
-      data: user,
-    });
+    return res.status(200).json(user);
   } catch (error) {
     console.log(error.message);
     response.status(500).send({ message: error.message });
