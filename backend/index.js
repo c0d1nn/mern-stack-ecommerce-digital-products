@@ -19,6 +19,8 @@ import {
   getDownloadURL,
 } from "./config/firebase.js";
 
+import shareHoldersRoutes from "./routes/shareHoldersRoutes.js";
+
 config();
 
 const upload = multer({ limits: { fileSize: 50 * 1024 * 1024 } });
@@ -41,6 +43,7 @@ app.use(express.json());
 app.use("/product", productRoute);
 app.use("/document", documentRoute);
 app.use("/article", articleRoute);
+app.use("/shareholder", shareHoldersRoutes);
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

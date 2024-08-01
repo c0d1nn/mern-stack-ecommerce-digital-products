@@ -21,7 +21,7 @@ const generateTokens = (userId) => {
 //ROUTE FOR REGISTER
 router.post("/register", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, name, password } = req.body;
 
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -32,6 +32,7 @@ router.post("/register", async (req, res) => {
 
     const newUser = new User({
       email,
+      name,
       password: hashedPassword,
     });
 
@@ -98,7 +99,7 @@ router.post("/login", async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
       const tokens = generateTokens(user._id);
-      console.log("Generated Tokens:", tokens);
+      // console.log("Generated Tokens:", tokens);
 
       res.json({
         accessToken: tokens.accessToken,
