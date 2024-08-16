@@ -5,9 +5,7 @@ import cors from "cors";
 import { v2 as cloudinary } from "cloudinary";
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
-import productRoute from "./routes/productRoute.js";
 import stripeRoute from "./routes/stripeRoute.js";
-import subscriberRoute from "./routes/subscriberRoute.js";
 import { authRouter } from "./controllers/authController.js";
 import documentRoute from "./routes/documentRoute.js";
 import articleRoute from "./routes/articleRoute.js";
@@ -40,7 +38,6 @@ mongoose
 
 app.use(express.json());
 
-app.use("/product", productRoute);
 app.use("/document", documentRoute);
 app.use("/article", articleRoute);
 app.use("/shareholder", shareHoldersRoutes);
@@ -110,5 +107,4 @@ app.post("/upload-image", upload.single("file"), async (req, res) => {
 // });
 
 app.use("/stripe", stripeRoute);
-app.use("/subscriber", subscriberRoute);
 app.use("/auth", authRouter);
