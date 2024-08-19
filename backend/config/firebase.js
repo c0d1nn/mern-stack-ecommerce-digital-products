@@ -2,6 +2,9 @@
 import { initializeApp } from "firebase/app";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getFirestore } from "firebase/firestore";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // const firebaseConfig = {
 //   apiKey: "AIzaSyBrXC2mw0Rq6WZzfJbwe-H1m6Z_UjuY2Dg",
@@ -14,13 +17,17 @@ import { getFirestore } from "firebase/firestore";
 //};
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA0-sw34D5K6zuCVcyxCJMrmSdaASk5rS0",
-  authDomain: "investor-57946.firebaseapp.com",
-  projectId: "investor-57946",
-  storageBucket: "investor-57946.appspot.com",
-  messagingSenderId: "787789281350",
-  appId: "1:787789281350:web:d2307022eb68c7310fb247",
+  apiKey: process.env.API_KEY,
+  authDomain: process.env.AUTH_DOMAIN,
+  projectId: process.env.PROJECT_ID,
+  storageBucket: process.env.STORAGE_BUCKET,
+  messagingSenderId: process.env.MESSAGING_SENDER_ID,
+  appId: process.env.APP_ID,
 };
+
+console.log("API Key:", process.env.API_KEY);
+console.log("Auth Domain:", process.env.AUTH_DOMAIN);
+console.log("Project ID:", process.env.PROJECT_ID);
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
