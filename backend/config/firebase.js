@@ -25,9 +25,9 @@ const firebaseConfig = {
   appId: process.env.APP_ID,
 };
 
-console.log("API Key:", process.env.API_KEY);
-console.log("Auth Domain:", process.env.AUTH_DOMAIN);
-console.log("Project ID:", process.env.PROJECT_ID);
+// console.log("API Key:", process.env.API_KEY);
+// console.log("Auth Domain:", process.env.AUTH_DOMAIN);
+// console.log("Project ID:", process.env.PROJECT_ID);
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
