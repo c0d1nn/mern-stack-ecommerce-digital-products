@@ -32,7 +32,11 @@ app.listen(process.env.PORT, () =>
 );
 
 mongoose
-  .connect(process.env.mongoDb)
+  .connect(process.env.mongoDb, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    ssl: true,
+  })
   .then(() => console.log("Database is connected"))
   .catch((error) => console.log(error));
 
