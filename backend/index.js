@@ -25,13 +25,7 @@ const upload = multer({ limits: { fileSize: 50 * 1024 * 1024 } });
 
 const app = express();
 
-app.use(
-  cors({
-    origin: "https://pigijo-admin.vercel.app",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
+app.use(cors());
 
 app.listen(process.env.PORT, () =>
   console.log(`Server running on ${process.env.PORT} PORT`)
