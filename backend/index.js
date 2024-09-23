@@ -25,7 +25,10 @@ const upload = multer({ limits: { fileSize: 50 * 1024 * 1024 } });
 
 const app = express();
 
-const allowedOrigins = ["https://pigijo-admin.vercel.app"];
+const allowedOrigins = [
+  "https://pigijo-admin.vercel.app",
+  "http://localhost:3000",
+];
 
 app.use(
   cors({
