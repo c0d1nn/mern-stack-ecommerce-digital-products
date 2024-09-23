@@ -13,12 +13,11 @@ import {
 // import AWS from "aws-sdk";
 
 const router = express.Router();
-
 const storageMulter = multer.memoryStorage();
-// const upload = multer({
-//   storage: storageMulter,
-//   limits: { fileSize: 50 * 1024 * 1024 }, // 50MB file limit
-// });
+const upload = multer({
+  storage: storageMulter,
+  limits: { fileSize: 50 * 1024 * 1024 },
+});
 
 // AWS.config.update({
 //   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -29,85 +28,39 @@ const storageMulter = multer.memoryStorage();
 // const s3 = new AWS.S3();
 
 // CREATE NEW DOCUMENT ROUTE FIREBASE
-// router.post("/", auth, upload.single("fileDocument"), async (req, res) => {
-//   try {
-//     if (
-//       !req.file ||
-//       !req.body.descriptionID ||
-//       !req.body.descriptionEN ||
-//       !req.body.articleDate ||
-//       !req.body.category ||
-//       !req.body.selectType
-//     ) {
-//       return res.status(400).send({
-//         message: "Required fields are missing",
-//       });
-//     }
-
-//     const storageRef = ref(storage, `documents/${req.file.originalname}`);
-//     const metadata = {
-//       contentType: req.file.mimetype,
-//     };
-
-//     const snapshot = await uploadBytes(storageRef, req.file.buffer, metadata);
-//     const fileUrl = await getDownloadURL(snapshot.ref);
-
-//     const newDocument = {
-//       descriptionID: req.body.descriptionID,
-//       descriptionEN: req.body.descriptionEN,
-//       fileDocument: {
-//         url: fileUrl,
-//         name: req.file.originalname,
-//       },
-//       articleDate: req.body.articleDate,
-//       category: req.body.category,
-//       selectType: req.body.selectType,
-//     };
-
-//     const document = await Document.create(newDocument);
-
-//     return res.status(201).send(document);
-//   } catch (error) {
-//     console.log(error.message);
-//     res.status(500).send({ message: error.message });
-//   }
-// });
-router.post("/", auth, async (req, res) => {
+router.post("/", auth, upload.single("fileDocument"), async (req, res) => {
   try {
-    const {
-      descriptionID,
-      descriptionEN,
-      articleDate,
-      category,
-      selectType,
-      fileDocument,
-      createdAt,
-    } = req.body;
-
     if (
-      !fileDocument ||
-      !descriptionID ||
-      !descriptionEN ||
-      !articleDate ||
-      !category ||
-      !selectType
+      !req.file ||
+      !req.body.descriptionID ||
+      !req.body.descriptionEN ||
+      !req.body.articleDate ||
+      !req.body.category ||
+      !req.body.selectType
     ) {
       return res.status(400).send({
         message: "Required fields are missing",
       });
     }
 
+    const storageRef = ref(storage, `documents/${req.file.originalname}`);
+    const metadata = {
+      contentType: req.file.mimetype,
+    };
+
+    const snapshot = await uploadBytes(storageRef, req.file.buffer, metadata);
+    const fileUrl = await getDownloadURL(snapshot.ref);
+
     const newDocument = {
-      descriptionID,
-      descriptionEN,
+      descriptionID: req.body.descriptionID,
+      descriptionEN: req.body.descriptionEN,
       fileDocument: {
-        url: fileDocument.url,
-        name: fileDocument.name,
+        url: fileUrl,
+        name: req.file.originalname,
       },
-      articleDate,
-      category,
-      selectType,
-      createdAt,
+      articleDate: req.body.articleDate,
+      category: req.body.category,
+      selectType: req.body.selectType,
     };
 
     const document = await Document.create(newDocument);
@@ -212,9 +165,7 @@ router.delete("/:id", auth, async (req, res) => {
     if (!result) {
       return res.status(404).json({ message: "Document not found" });
     }
-    const fileName = `documents/${result.fileDocument.name}`;
-    const file = bucket.file(fileName);
-    await file.delete();
+
     res
       .status(200)
       .json({ message: "Document successfully deleted", deletedItem: result });
@@ -251,48 +202,16 @@ router.delete("/:id", auth, async (req, res) => {
 // });
 
 // UPDATE DOCUMENT ROUTE (excluding file data)
-
-// router.put("/:id", auth, async (req, res) => {
-//   try {
-//     const { id } = req.params;
-
-//     const updateData = {
-//       descriptionID: req.body.descriptionID,
-//       descriptionEN: req.body.descriptionEN,
-//       articleDate: req.body.articleDate,
-//       category: req.body.category,
-//       selectType: req.body.selectType,
-//     };
-
-//     const result = await Document.findByIdAndUpdate(id, updateData, {
-//       new: true,
-//     });
-
-//     if (!result) {
-//       return res.status(404).json({ message: "Document not found" });
-//     }
-
-//     return res
-//       .status(200)
-//       .send({ message: "Document updated", updatedDocument: result });
-//   } catch (error) {
-//     console.log(error.message);
-//     res.status(500).send({ message: error.message });
-//   }
-// });
 router.put("/:id", auth, async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { descriptionID, descriptionEN, articleDate, category, selectType } =
-      req.body;
-
     const updateData = {
-      descriptionID,
-      descriptionEN,
-      articleDate,
-      category,
-      selectType,
+      descriptionID: req.body.descriptionID,
+      descriptionEN: req.body.descriptionEN,
+      articleDate: req.body.articleDate,
+      category: req.body.category,
+      selectType: req.body.selectType,
     };
 
     const result = await Document.findByIdAndUpdate(id, updateData, {

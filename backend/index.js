@@ -27,7 +27,7 @@ const app = express();
 
 const allowedOrigins = [
   "https://pigijo-admin.vercel.app",
-  "http://localhost:3000",
+  "https://localhost:5173",
 ];
 
 app.use(
