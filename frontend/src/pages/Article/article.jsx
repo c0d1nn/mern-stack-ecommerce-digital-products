@@ -23,6 +23,7 @@ const Article = () => {
   const [descriptionEN, setDescriptionEN] = useState("");
   const [articleDate, setArticleDate] = useState("");
   const [category, setCategory] = useState("");
+  const [selectedArticleId, setSelectedArticleId] = useState(null);
 
   const token = sessionStorage.getItem("token");
 
@@ -134,6 +135,10 @@ const Article = () => {
     };
 
     reader.readAsDataURL(e.target.files[0]);
+  };
+
+  const handleRowClick = (articleId) => {
+    setSelectedArticleId(articleId);
   };
 
   const handleDelete = async (articleId) => {
@@ -398,7 +403,7 @@ const Article = () => {
                   <tbody>
                     {articles.map((article) => {
                       return (
-                        <tr key={article._id}>
+                        <tr key={article._id} onClick={() => handleRowClick()}>
                           <td>{article.titleEN}</td>
                           <td>{article.titleID}</td>
                           <td>{article.descriptionID}</td>
