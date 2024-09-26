@@ -154,7 +154,7 @@ const Article = () => {
         return;
       }
       await axios.delete(
-        `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}${articleId}`
+        `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/article/${articleId}`
       );
       console.log("Article deleted successfully!");
       toast.warning("Article deleted successfully!");
