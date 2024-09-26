@@ -392,6 +392,7 @@ const Article = () => {
                       <td>Article Date</td>
                       <td>Category</td>
                       <td>Image</td>
+                      <td>Delete</td>
                     </tr>
                   </thead>
                   <tbody>
@@ -412,6 +413,20 @@ const Article = () => {
                                 style={{ maxWidth: "100%", height: "60px" }}
                               />
                             )}
+                          </td>
+                          <td>
+                            <img
+                              src={trash}
+                              alt=""
+                              style={{
+                                width: "25px",
+                                height: "25px",
+                                margin: "auto",
+                                display: "block",
+                                cursor: "pointer",
+                              }}
+                              onClick={() => handleDelete(document._id)}
+                            />
                           </td>
                         </tr>
                       );
