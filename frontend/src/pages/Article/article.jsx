@@ -425,7 +425,7 @@ const Article = () => {
                                 display: "block",
                                 cursor: "pointer",
                               }}
-                              onClick={() => handleDelete(document._id)}
+                              onClick={() => handleDelete(article._id)}
                             />
                           </td>
                         </tr>
