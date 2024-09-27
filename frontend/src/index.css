@@ -1,11 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* @import "bootstrap"; */
 
-@keyframes spin {
-    to { transform: rotate(360deg);} 
-}
+/* body {
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa;
+} */
 
-.animate-spin {
-    animation: spin 1s linear infinite;
+.container {
+  padding: 20px;
 }

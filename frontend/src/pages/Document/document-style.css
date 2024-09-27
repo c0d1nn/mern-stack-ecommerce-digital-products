@@ -1,0 +1,23 @@
+form-check-input {
+  width: 22px !important;
+  height: 22px;
+}
+
+.custom-input {
+  width: 30px;
+  height: 30px;
+}
+
+.form-check {
+  padding-bottom: 0px !important;
+  height: 35px;
+}
+
+thead tr td {
+  /* text-align: center !important; */
+  text: center !important;
+}
+
+label {
+  text-align: left;
+}

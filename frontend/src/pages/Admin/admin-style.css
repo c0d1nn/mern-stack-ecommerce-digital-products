@@ -1,0 +1,23 @@
+body {
+  font-size: 14px;
+  font-weight: 700;
+}
+label {
+  text-align: right;
+  padding: 7px 15px;
+}
+
+input {
+  height: 45px;
+  padding: 10.5px 16px;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+table {
+  width: 100% !important;
+}
+
+.btn {
+  font-weight: 600;
+}

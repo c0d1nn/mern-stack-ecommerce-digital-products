@@ -1,0 +1,7 @@
+Nav {
+  justify-content: center;
+}
+
+.nav-link.active {
+  font-weight: bold;
+}
