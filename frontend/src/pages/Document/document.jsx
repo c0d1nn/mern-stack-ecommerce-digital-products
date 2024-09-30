@@ -29,6 +29,9 @@ const Document = () => {
   const [category, setCategory] = useState("");
   const [selectType, setSelectType] = useState("");
   const [selectedDocumentId, setSelectedDocumentId] = useState(null);
+  const [filterType, setFilterType] = useState("");
+  const [filterDate, setFilterDate] = useState("");
+  const [uniqueYears, setUniqueYears] = useState([]);
   // useEffect(() => {
   //   axios
   //     .get(import.meta.env.VITE_REACT_APP_BACKEND_BASEURL)
@@ -54,6 +57,10 @@ const Document = () => {
       .then((response) => {
         setDocuments(response.data);
         setLoading(false);
+        const years = response.data.map((doc) =>
+          new Date(doc.articleDate).getFullYear()
+        );
+        setUniqueYears([...new Set(years)]);
       })
       .catch((err) => {
         console.log(err);
@@ -119,6 +126,10 @@ const Document = () => {
         }
       );
       setDocuments(response.data);
+      const years = response.data.map((doc) =>
+        new Date(doc.articleDate).getFullYear()
+      );
+      setUniqueYears([...new Set(years)]);
     } catch (error) {
       console.error("Error adding Document:", error);
       toast.error("Failed to add Document.");
@@ -169,6 +180,10 @@ const Document = () => {
         }
       );
       setDocuments(response.data);
+      const years = response.data.map((doc) =>
+        new Date(doc.articleDate).getFullYear()
+      );
+      setUniqueYears([...new Set(years)]);
     } catch (error) {
       console.error("Error deleting document:", error);
       if (error.response && error.response.status === 500) {
@@ -180,6 +195,15 @@ const Document = () => {
       }
     }
   };
+
+  const filteredDocuments = documents.filter((doc) => {
+    const documentYear = new Date(doc.articleDate).getFullYear();
+    const matchesType = filterType ? doc.selectType === filterType : true;
+    const matchesDate = filterDate
+      ? documentYear === parseInt(filterDate)
+      : true;
+    return matchesType && matchesDate;
+  });
 
   return (
     <>
@@ -257,7 +281,7 @@ const Document = () => {
                     htmlFor="ArticleDate"
                     className="col-sm-4 col-form-label text-right"
                   >
-                    Article Date
+                    Document Date
                   </label>
                   <div className="col-sm-8">
                     <input
@@ -360,6 +384,48 @@ const Document = () => {
           </AccordionSummary>
           <AccordionDetails>
             <Typography>
+              <div className="filter-section my-4">
+                <div className="row">
+                  <div className="col-md-6">
+                    <label htmlFor="filterType">Filter by Type</label>
+                    <select
+                      className="form-control"
+                      id="filterType"
+                      value={filterType}
+                      onChange={(e) => setFilterType(e.target.value)}
+                    >
+                      <option value="">All Types</option>
+                      <option value="Keterbukaan Informasi">
+                        Keterbukaan Informasi
+                      </option>
+                      <option value="Keuangan">Keuangan</option>
+                      <option value="Laporan Keuangan">Laporan Keuangan</option>
+                      <option value="Laporan Tahunan">Laporan Tahunan</option>
+                      <option value="Rapat Umum Pemegang Saham">
+                        Rapat Umum Pemegang Saham
+                      </option>
+                      <option value="Siaran Pers">Siaran Pers</option>
+                    </select>
+                  </div>
+                  <div className="col-md-6">
+                    <label htmlFor="filterDate">Filter by Document Year</label>
+                    <select
+                      className="form-control"
+                      id="filterDate"
+                      value={filterDate}
+                      onChange={(e) => setFilterDate(e.target.value)}
+                    >
+                      <option value="">All Years</option>
+                      {uniqueYears.map((year) => (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
               <div className="table-responsive" style={{ overflowX: "auto" }}>
                 <table className="table">
                   <thead>
@@ -395,7 +461,7 @@ const Document = () => {
                         ]}
                       />
                     ) : (
-                      documents.map((document) => {
+                      filteredDocuments.map((document) => {
                         return (
                           <tr
                             key={document._id}

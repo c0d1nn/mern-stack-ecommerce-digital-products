@@ -148,12 +148,14 @@ const useAuth = () => {
         ] = `Bearer ${accessToken}`;
 
         await fetchUserData();
-        navigate(lastVisitedPage || "/admin");
+        return true;
       } else {
         console.error("No access token received from the server");
+        return false;
       }
     } catch (error) {
       console.error("Error logging in:", error);
+      return false;
     }
   };
 

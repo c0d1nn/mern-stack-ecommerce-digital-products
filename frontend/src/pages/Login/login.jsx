@@ -42,12 +42,20 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await login(email, password);
-      toast.success("Successfully Logged In!");
-      navigate("/admin");
+      const response = await login(email, password);
+      if (response) {
+        toast.success("Successfully Logged In!");
+        navigate("/admin");
+      } else {
+        toast.error("Login failed. Please check your email or password.");
+      }
     } catch (err) {
       console.error(err);
-      toast.error("Wrong Email or Password!");
+      if (err.response && err.response.status === 401) {
+        toast.error("Wrong Email or Password!");
+      } else {
+        toast.error("An unexpected error occurred. Please try again.");
+      }
     }
   };
 
