@@ -5,7 +5,6 @@ import cors from "cors";
 import { v2 as cloudinary } from "cloudinary";
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
-import stripeRoute from "./routes/stripeRoute.js";
 import { authRouter } from "./controllers/authController.js";
 import documentRoute from "./routes/documentRoute.js";
 import articleRoute from "./routes/articleRoute.js";
@@ -29,6 +28,7 @@ const allowedOrigins = [
   "https://pigijo-admin.vercel.app",
   "http://localhost:5173",
   "https://investor-admin-pgjo.vercel.app",
+  "http://localhost:3001",
 ];
 
 app.use(
@@ -126,5 +126,5 @@ app.post("/upload-image", upload.single("file"), async (req, res) => {
 //   }
 // });
 
-app.use("/stripe", stripeRoute);
+// app.use("/stripe", stripeRoute);
 app.use("/auth", authRouter);
