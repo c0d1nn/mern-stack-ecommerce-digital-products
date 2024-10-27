@@ -1,74 +1,130 @@
-import express from "express"
-import { config } from "dotenv"
-import mongoose from "mongoose"
-import cors from "cors"
-import { v2 as cloudinary } from "cloudinary"
-import multer from "multer"
-import { CloudinaryStorage } from "multer-storage-cloudinary"
-import productRoute from "./routes/productRoute.js"
-import stripeRoute from "./routes/stripeRoute.js"
-import subscriberRoute from "./routes/subscriberRoute.js"
+import express from "express";
+import { config } from "dotenv";
+import mongoose from "mongoose";
+import cors from "cors";
+import { v2 as cloudinary } from "cloudinary";
+import multer from "multer";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 import { authRouter } from "./controllers/authController.js";
+import documentRoute from "./routes/documentRoute.js";
+import articleRoute from "./routes/articleRoute.js";
 
+import {
+  storage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+} from "./config/firebase.js";
+
+import shareHoldersRoutes from "./routes/shareHoldersRoutes.js";
 
 config();
 
+const upload = multer({ limits: { fileSize: 50 * 1024 * 1024 } });
+
 const app = express();
 
+const allowedOrigins = [
+  "https://pigijo-admin.vercel.app",
+  "http://localhost:5173",
+  "https://investor-admin-pgjo.vercel.app",
+  "http://localhost:3001",
+];
 
-app.use(cors());
+app.use(
+  cors({
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.listen(process.env.PORT, () => console.log(`Server running on ${process.env.PORT} PORT`));
+app.listen(process.env.PORT, () =>
+  console.log(`Server running on ${process.env.PORT} PORT`)
+);
 
 mongoose
-    .connect(process.env.mongoDb)
-    .then(() => console.log('Database is connected'))
-    .catch((error) => console.log(error));
+  .connect(process.env.mongoDb, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    ssl: true,
+  })
+  .then(() => console.log("Database is connected"))
+  .catch((error) => console.log(error));
 
 app.use(express.json());
 
-app.use('/product', productRoute);
+app.use("/document", documentRoute);
+app.use("/article", articleRoute);
+app.use("/shareholder", shareHoldersRoutes);
 
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 app.use((req, res, next) => {
-    req.cloudinary = cloudinary;
-    next();
+  req.cloudinary = cloudinary;
+  next();
 });
 
-const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-        folder: 'images',
-        allowedFormats: ['jpeg', 'png', 'jpg'],
-    }
-});
+// const storage = new CloudinaryStorage({
+//   cloudinary: cloudinary,
+//   params: {
+//     folder: "images",
+//     allowedFormats: ["jpeg", "png", "jpg"],
+//   },
+// });
 
 const parser = multer({ storage: storage });
 
 //ROUTE FOR UPLOADING THE FILE TO CLOUDINARY
-app.post('/upload-image', parser.single('file'), (req, res) => {
-    if (!req.file) {
-        return res.status(400).send('No file uploaded.');
-    }
+app.post("/upload-image", upload.single("file"), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).send("No file uploaded.");
+  }
 
-    try {
-        if (!req.file.path) {
-            throw new Error('File uploaded, but no path available');
-        }
+  try {
+    const storageRef = ref(
+      storage,
+      `images/${Date.now()}-${req.file.originalname}`
+    );
+    const metadata = {
+      contentType: req.file.mimetype,
+    };
 
-        res.json({ secure_url: req.file.path });
-    } catch (error) {
-        console.error('Error during file upload: ', error);
-        res.status(500).send('Internal server error');
-    }
+    const snapshot = await uploadBytes(storageRef, req.file.buffer, metadata);
+
+    const downloadURL = await getDownloadURL(snapshot.ref);
+
+    res.json({ secure_url: downloadURL });
+  } catch (error) {
+    console.error("Error during file upload:", error);
+    res.status(500).send("Internal server error");
+  }
 });
 
-app.use('/stripe', stripeRoute)
-app.use('/subscriber', subscriberRoute)
-app.use('/auth', authRouter);
+// app.post("/upload-image", parser.single("file"), (req, res) => {
+//   if (!req.file) {
+//     return res.status(400).send("No file uploaded.");
+//   }
+
+//   try {
+//     if (!req.file.path) {
+//       throw new Error("File uploaded, but no path available");
+//     }
+
+//     res.json({ secure_url: req.file.path });
+//   } catch (error) {
+//     console.error("Error during file upload: ", error);
+//     res.status(500).send("Internal server error");
+//   }
+// });
+
+// app.use("/stripe", stripeRoute);
+app.use("/auth", authRouter);

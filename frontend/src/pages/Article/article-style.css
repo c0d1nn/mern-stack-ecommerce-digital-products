@@ -1,0 +1,39 @@
+body {
+  font-size: 14px;
+  font-weight: 400;
+}
+label {
+  text-align: right;
+  padding: 7px 15px;
+}
+
+input {
+  height: 45px;
+  padding: 10.5px 16px !important;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+#internal {
+  margin-bottom: 0rem;
+}
+textarea {
+  margin-bottom: 1.5rem;
+}
+.MuiAccordionDetails-root {
+  display: block !important;
+}
+
+/* .custom-radio {
+  width: 1em !important;
+  height: 1em !important;
+  border-radius: 50% !important;
+} */
+
+.form-check .form-check-input {
+  float: none !important;
+}
+
+.form-check-input[type="radio"] {
+  border-radius: 50% !important;
+}
